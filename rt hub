@@ -1,6 +1,7 @@
 --[[ 
+  --[[ 
     RT HUB | SUPREME EDITION (INTEGRATED)
-    Funcionalidades: Movimento, Automação, Visual, Jogadores, Config, Item Spawner, Extra e Créditos.
+    Funcionalidades: Movimento, Automação, Visual, Jogadores, Config e Item Spawner.
     Pasta de Itens: ReplicatedStorage.Items
     Senha: 9921
 ]]
@@ -35,8 +36,7 @@ local Keybinds = {
     Noclip = Enum.KeyCode.N,
     Fling = Enum.KeyCode.X,
     ESP = Enum.KeyCode.P,
-    Menu = Enum.KeyCode.K,
-    Progresso = Enum.KeyCode.E
+    Menu = Enum.KeyCode.K
 }
 
 local States = {
@@ -47,16 +47,8 @@ local States = {
     GodMode = false,
     FakeLag = false,
     AutoEquip = false,
-    AutoProg = false,
-    AutoClick = false,
-    Aimbot = false,
-    FullBright = false,
-    SavedPoint = nil,
-    TempoInicial = os.time()
+    SavedPoint = nil
 }
-
--- Definindo atualizadores de UI para os atalhos de teclado
-local updateFlyUI, updateNoclipUI, updateFlingUI, updateESPUI, updateProgUI
 
 -- // LIMPEZA DE VERSÕES ANTERIORES
 if pGui:FindFirstChild("RT_HUB_SUPREME") then pGui["RT_HUB_SUPREME"]:Destroy() end
@@ -64,7 +56,6 @@ if pGui:FindFirstChild("RT_HUB_SUPREME") then pGui["RT_HUB_SUPREME"]:Destroy() e
 local screenGui = Instance.new("ScreenGui", pGui)
 screenGui.Name = "RT_HUB_SUPREME"
 screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
 
 -- // FUNÇÕES AUXILIARES DE UI
 local function aplicarEstilo(obj, radius)
@@ -73,9 +64,7 @@ local function aplicarEstilo(obj, radius)
 end
 
 local function notify(t)
-    pcall(function()
-        StarterGui:SetCore("SendNotification", {Title = "RT HUB", Text = t, Duration = 2})
-    end)
+    StarterGui:SetCore("SendNotification", {Title = "RT HUB", Text = t, Duration = 2})
 end
 
 -- // --- TELA DE LOGIN ---
@@ -114,8 +103,8 @@ aplicarEstilo(loginBtn, 8)
 
 -- // --- INTERFACE PRINCIPAL ---
 local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 650, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
+mainFrame.Size = UDim2.new(0, 650, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -325, 0.5, -200)
 mainFrame.BackgroundColor3 = COR_FUNDO
 mainFrame.Visible = false
 aplicarEstilo(mainFrame, 12)
@@ -127,21 +116,12 @@ sidebar.BackgroundColor3 = COR_SIDEBAR
 aplicarEstilo(sidebar, 12)
 
 local logo = Instance.new("TextLabel", sidebar)
-logo.Size = UDim2.new(1, 0, 0, 60)
+logo.Size = UDim2.new(1, 0, 0, 70)
 logo.Text = "RT HUB"
 logo.TextColor3 = COR_ROXA
 logo.Font = Enum.Font.FredokaOne
 logo.TextSize = 28
 logo.BackgroundTransparency = 1
-
-local sidebarBtns = Instance.new("ScrollingFrame", sidebar)
-sidebarBtns.Size = UDim2.new(1, 0, 1, -60)
-sidebarBtns.Position = UDim2.new(0, 0, 0, 60)
-sidebarBtns.BackgroundTransparency = 1
-sidebarBtns.ScrollBarThickness = 0
-local btnLayout = Instance.new("UIListLayout", sidebarBtns)
-btnLayout.Padding = UDim.new(0, 6)
-btnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 local pagesFolder = Instance.new("Frame", mainFrame)
 pagesFolder.Size = UDim2.new(1, -200, 1, -30)
@@ -174,14 +154,13 @@ local spawnerPage = createPage("Spawner")
 local autoPage = createPage("Automação")
 local visualPage = createPage("Visual")
 local playersPage = createPage("Jogadores")
-local extraPage = createPage("Extra")
-local creditsPage = createPage("Créditos")
 local configPage = createPage("Config")
 homePage.Visible = true
 
-local function createSidebarBtn(name)
-    local btn = Instance.new("TextButton", sidebarBtns)
-    btn.Size = UDim2.new(0.85, 0, 0, 36)
+local function createSidebarBtn(name, yPos)
+    local btn = Instance.new("TextButton", sidebar)
+    btn.Size = UDim2.new(0.85, 0, 0, 38)
+    btn.Position = UDim2.new(0.075, 0, 0, yPos)
     btn.BackgroundColor3 = COR_BT_OFF
     btn.Text = "  " .. name
     btn.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -219,15 +198,13 @@ local function createSidebarBtn(name)
     end
 end
 
-createSidebarBtn("Início")
-createSidebarBtn("Movimento")
-createSidebarBtn("Spawner")
-createSidebarBtn("Automação")
-createSidebarBtn("Visual")
-createSidebarBtn("Jogadores")
-createSidebarBtn("Extra")
-createSidebarBtn("Créditos")
-createSidebarBtn("Config")
+createSidebarBtn("Início", 80)
+createSidebarBtn("Movimento", 125)
+createSidebarBtn("Spawner", 170)
+createSidebarBtn("Automação", 215)
+createSidebarBtn("Visual", 260)
+createSidebarBtn("Jogadores", 305)
+createSidebarBtn("Config", 350)
 
 -- // --- COMPONENTES DE UI ---
 
@@ -329,80 +306,7 @@ local function createKeybindSetting(parent, text, keyType)
     end)
 end
 
--- // --- POPULANDO PÁGINAS ---
-
--- 1. HOME (INÍCIO)
-local hTitle = Instance.new("TextLabel", homePage)
-hTitle.Size = UDim2.new(1, 0, 0, 30); hTitle.BackgroundTransparency = 1
-hTitle.Text = "Bem-vindo ao RT HUB SUPREME"; hTitle.TextColor3 = COR_ROXA; hTitle.Font = Enum.Font.GothamBold; hTitle.TextSize = 16
-
-local hSub = Instance.new("TextLabel", homePage)
-hSub.Size = UDim2.new(1, 0, 0, 45); hSub.BackgroundTransparency = 1
-hSub.Text = "Todas as funções foram unificadas aqui.\nAcesse os menus na barra lateral."; hSub.TextColor3 = Color3.new(0.8,0.8,0.8); hSub.Font = Enum.Font.Gotham; hSub.TextSize = 13
-
-local infoFrame = Instance.new("Frame", homePage)
-infoFrame.Size = UDim2.new(1, -10, 0, 100)
-infoFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-aplicarEstilo(infoFrame, 6)
-
-local function createInfoLabel(parent, text, yPos)
-    local l = Instance.new("TextLabel", parent)
-    l.Size = UDim2.new(1, -20, 0, 25)
-    l.Position = UDim2.new(0, 10, 0, yPos)
-    l.BackgroundTransparency = 1
-    l.Text = text
-    l.TextColor3 = Color3.new(1,1,1)
-    l.Font = Enum.Font.GothamSemibold
-    l.TextSize = 13
-    l.TextXAlignment = Enum.TextXAlignment.Left
-    return l
-end
-
-createInfoLabel(infoFrame, "Usuário: " .. Player.Name, 10)
-local execName = (identifyexecutor and identifyexecutor()) or "Desconhecido"
-createInfoLabel(infoFrame, "Executador: " .. execName, 35)
-local timerLabel = createInfoLabel(infoFrame, "Tempo Ativo: 00:00:00", 60)
-
--- 2. MOVIMENTO
-local function toggleFly(state)
-    States.Flying = state
-    local char = Player.Character
-    if States.Flying and char then
-        local hrp = char:WaitForChild("HumanoidRootPart")
-        local bv = Instance.new("BodyVelocity", hrp); bv.Name = "RT_FlyVel"
-        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        local bg = Instance.new("BodyGyro", hrp); bg.Name = "RT_FlyGyro"
-        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        char.Humanoid.PlatformStand = true
-        task.spawn(function()
-            while States.Flying and char.Parent do
-                local cam = workspace.CurrentCamera
-                local dir = Vector3.new(0,0,0)
-                if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
-                bv.Velocity = dir.Unit * 80
-                if dir == Vector3.new(0,0,0) then bv.Velocity = Vector3.new(0,0,0) end
-                bg.CFrame = cam.CFrame
-                task.wait()
-            end
-            if bv then bv:Destroy() end
-            if bg then bg:Destroy() end
-            if char:FindFirstChild("Humanoid") then char.Humanoid.PlatformStand = false end
-        end)
-    end
-    if updateFlyUI then updateFlyUI(state) end
-end
-
-updateFlyUI = createToggle(movePage, "Fly / Voar", States.Flying, toggleFly)
-updateNoclipUI = createToggle(movePage, "Noclip (Atravessar Paredes)", States.Noclip, function(s) States.Noclip = s end)
-updateFlingUI = createToggle(movePage, "Touch Fling (Matar ao Tocar)", States.Fling, function(s) States.Fling = s end)
-createToggle(movePage, "Fake Lag", States.FakeLag, function(s) States.FakeLag = s end)
-createButton(movePage, "DEFINIR PONTO DE TELEPORT", function() if Player.Character then States.SavedPoint = Player.Character.HumanoidRootPart.CFrame; notify("Ponto salvo!") end end)
-createButton(movePage, "TELEPORTAR PARA PONTO", function() if States.SavedPoint and Player.Character then Player.Character.HumanoidRootPart.CFrame = States.SavedPoint end end)
-
--- 3. SPAWNER
+-- // --- LÓGICA DO SPAWNER (INTEGRADA) ---
 local spawnerInput = Instance.new("TextBox", spawnerPage)
 spawnerInput.Size = UDim2.new(1, -10, 0, 45)
 spawnerInput.BackgroundColor3 = COR_BT_OFF
@@ -428,7 +332,7 @@ local refreshSpawner = Instance.new("TextButton", spawnerButtons)
 refreshSpawner.Size = UDim2.new(0.48, 0, 1, 0)
 refreshSpawner.Position = UDim2.new(0.52, 0, 0, 0)
 refreshSpawner.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-refreshSpawner.Text = "ATUALIZAR LISTA"
+refreshSpawner.Text = "ATUALIZAR (R)"
 refreshSpawner.TextColor3 = Color3.new(1,1,1)
 refreshSpawner.Font = Enum.Font.GothamBold
 aplicarEstilo(refreshSpawner, 8)
@@ -486,85 +390,42 @@ end
 spawnBtn.MouseButton1Click:Connect(function() spawnItem(spawnerInput.Text) end)
 refreshSpawner.MouseButton1Click:Connect(updateSpawnerList)
 
--- 4. AUTOMAÇÃO
-createToggle(autoPage, "God Mode (Cura Infinita)", States.GodMode, function(s) States.GodMode = s end)
-createToggle(autoPage, "Aimbot", States.Aimbot, function(s) States.Aimbot = s end)
-createToggle(autoPage, "Auto Click (45ms)", States.AutoClick, function(s) States.AutoClick = s end)
-updateProgUI = createToggle(autoPage, "Progresso Automático (Tecla E)", States.AutoProg, function(s) States.AutoProg = s end)
+-- // --- LÓGICA DE MOVIMENTO (COMPLETA) ---
+local updateFlyUI, updateNoclipUI, updateFlingUI, updateESPUI
 
--- 5. VISUAL
-updateESPUI = createToggle(visualPage, "ESP Players (Highlight)", States.ESP, function(s) States.ESP = s end)
-createToggle(visualPage, "Full Bright & No Fog", States.FullBright, function(s) 
-    States.FullBright = s
-    Lighting.Brightness = s and 2 or 1
-    Lighting.FogEnd = s and 100000 or 1000
-end)
-
--- 6. JOGADORES
-createButton(playersPage, "REDEFINIR PERSONAGEM (Reset)", function() Player.Character:BreakJoints() end)
-createButton(playersPage, "LIMPAR FERRAMENTAS (Backpack)", function() Player.Backpack:ClearAllChildren() end)
-
--- 7. EXTRA
-createButton(extraPage, "Server Hop (Trocar Servidor)", function()
-    local x = {}
-    local success, result = pcall(function()
-        return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"))
-    end)
-    if success and result and result.data then
-        for _, v in ipairs(result.data) do
-            if v.playing < v.maxPlayers and v.id ~= game.JobId then x[#x + 1] = v.id end
-        end
-        if #x > 0 then 
-            notify("Teleportando para novo servidor...")
-            TeleportService:TeleportToPlaceInstance(game.PlaceId, x[math.random(1, #x)]) 
-        end
-    else
-        notify("Erro ao buscar servidores.")
+-- FLY LOGIC
+local function toggleFly(state)
+    States.Flying = state
+    local char = Player.Character
+    if States.Flying and char then
+        local hrp = char:WaitForChild("HumanoidRootPart")
+        local bv = Instance.new("BodyVelocity", hrp); bv.Name = "RT_FlyVel"
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        local bg = Instance.new("BodyGyro", hrp); bg.Name = "RT_FlyGyro"
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        char.Humanoid.PlatformStand = true
+        task.spawn(function()
+            while States.Flying and char.Parent do
+                local cam = workspace.CurrentCamera
+                local dir = Vector3.new(0,0,0)
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
+                bv.Velocity = dir.Unit * 80
+                if dir == Vector3.new(0,0,0) then bv.Velocity = Vector3.new(0,0,0) end
+                bg.CFrame = cam.CFrame
+                task.wait()
+            end
+            if bv then bv:Destroy() end
+            if bg then bg:Destroy() end
+            if char:FindFirstChild("Humanoid") then char.Humanoid.PlatformStand = false end
+        end)
     end
-end)
+    if updateFlyUI then updateFlyUI(state) end
+end
 
--- 8. CRÉDITOS
-createButton(creditsPage, "Dono: nao_podenamorar", function() end)
-createButton(creditsPage, "Dev: desistiu", function() end)
-createButton(creditsPage, "Dev Auxiliar: nao tem", function() end)
-
--- 9. CONFIGURAÇÕES
-createKeybindSetting(configPage, "Menu Principal", "Menu")
-createKeybindSetting(configPage, "Progresso Auto.", "Progresso")
-createKeybindSetting(configPage, "Fly / Voo", "Fly")
-createKeybindSetting(configPage, "Noclip", "Noclip")
-createKeybindSetting(configPage, "Touch Fling", "Fling")
-createKeybindSetting(configPage, "ESP Players", "ESP")
-
--- // --- SISTEMA DE LOOPS GERAIS ---
-
--- Timer Loop
-task.spawn(function()
-    while task.wait(1) do
-        local diff = os.time() - States.TempoInicial
-        local h, m, s = math.floor(diff/3600), math.floor((diff%3600)/60), diff%60
-        timerLabel.Text = string.format("Tempo Ativo: %02d:%02d:%02d", h, m, s)
-    end
-end)
-
--- Progresso e AutoClick Loop
-task.spawn(function()
-    while true do
-        if States.AutoProg then
-            local rem = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("UpdateProgress")
-            if rem then rem:FireServer(5000) end -- Valor seguro para não resetar gema
-        end
-        if States.AutoClick then
-            VirtualUser:CaptureController()
-            VirtualUser:Button1Down(Vector2.new(0,0))
-            task.wait(0.01)
-            VirtualUser:Button1Up(Vector2.new(0,0))
-        end
-        task.wait(0.045)
-    end
-end)
-
--- Noclip Loop
+-- NOCLIP LOGIC
 RunService.Stepped:Connect(function()
     if States.Noclip and Player.Character then
         for _, v in pairs(Player.Character:GetDescendants()) do
@@ -573,30 +434,7 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- God Mode e Fake Lag Loops
-RunService.Heartbeat:Connect(function() 
-    if States.GodMode and Player.Character then 
-        local h = Player.Character:FindFirstChild("Humanoid") 
-        if h and h.Health < h.MaxHealth then h.Health = h.MaxHealth end 
-    end 
-end)
-
-task.spawn(function()
-    while true do
-        task.wait()
-        if States.FakeLag then
-            local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                hrp.Anchored = true
-                task.wait(0.25)
-                hrp.Anchored = false
-                task.wait(0.05)
-            end
-        end
-    end
-end)
-
--- Fling Logic Loop
+-- FLING LOGIC (MATAR JOGADORES AO TOCAR)
 task.spawn(function()
     local movel = 0.1
     while true do
@@ -619,7 +457,7 @@ task.spawn(function()
     end
 end)
 
--- ESP Loop
+-- ESP LOGIC
 RunService.RenderStepped:Connect(function()
     for _, p in pairs(Players:GetPlayers()) do
         if p ~= Player and p.Character then
@@ -637,7 +475,65 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- // --- SISTEMA DE LOGIN E CONTROLE DE INPUTS ---
+-- FAKE LAG LOGIC
+task.spawn(function()
+    while true do
+        task.wait()
+        if States.FakeLag then
+            local hrp = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.Anchored = true
+                task.wait(0.25)
+                hrp.Anchored = false
+                task.wait(0.05)
+            end
+        end
+    end
+end)
+
+-- // --- POPULANDO PÁGINAS ---
+
+-- Home
+local hTitle = Instance.new("TextLabel", homePage)
+hTitle.Size = UDim2.new(1, 0, 0, 30); hTitle.BackgroundTransparency = 1
+hTitle.Text = "Bem-vindo ao RT HUB SUPREME"; hTitle.TextColor3 = COR_ROXA; hTitle.Font = Enum.Font.GothamBold; hTitle.TextSize = 16
+
+local hSub = Instance.new("TextLabel", homePage)
+hSub.Size = UDim2.new(1, 0, 0, 60); hSub.BackgroundTransparency = 1
+hSub.Text = "Use [" .. Keybinds.Menu.Name .. "] para abrir/fechar o menu.\nTodas as funções foram unificadas aqui."; hSub.TextColor3 = Color3.new(0.8,0.8,0.8); hSub.Font = Enum.Font.Gotham; hSub.TextSize = 13
+
+-- Movimento
+updateFlyUI = createToggle(movePage, "Fly / Voar", States.Flying, toggleFly)
+updateNoclipUI = createToggle(movePage, "Noclip (Paredes)", States.Noclip, function(s) States.Noclip = s end)
+updateFlingUI = createToggle(movePage, "Touch Fling (Matar)", States.Fling, function(s) States.Fling = s end)
+createToggle(movePage, "Fake Lag", States.FakeLag, function(s) States.FakeLag = s end)
+createButton(movePage, "DEFINIR PONTO DE TELEPORT", function() if Player.Character then States.SavedPoint = Player.Character.HumanoidRootPart.CFrame; notify("Ponto salvo!") end end)
+createButton(movePage, "TELEPORTAR PARA PONTO", function() if States.SavedPoint then Player.Character.HumanoidRootPart.CFrame = States.SavedPoint end end)
+
+-- Automação
+createToggle(autoPage, "God Mode (Cura Infinita)", States.GodMode, function(s) States.GodMode = s end)
+RunService.Heartbeat:Connect(function() 
+    if States.GodMode then 
+        local h = Player.Character:FindFirstChild("Humanoid") 
+        if h and h.Health < h.MaxHealth then h.Health = h.MaxHealth end 
+    end 
+end)
+
+-- Visual
+updateESPUI = createToggle(visualPage, "ESP Players (Highlight)", States.ESP, function(s) States.ESP = s end)
+
+-- Jogadores (Exemplo de botões rápidos)
+createButton(playersPage, "REDEFINIR PERSONAGEM", function() Player.Character:BreakJoints() end)
+createButton(playersPage, "LIMPAR FERRAMENTAS", function() Player.Backpack:ClearAllChildren() end)
+
+-- Configurações
+createKeybindSetting(configPage, "Menu Principal", "Menu")
+createKeybindSetting(configPage, "Fly / Voo", "Fly")
+createKeybindSetting(configPage, "Noclip", "Noclip")
+createKeybindSetting(configPage, "Fling", "Fling")
+createKeybindSetting(configPage, "ESP", "ESP")
+
+-- // --- SISTEMA DE LOGIN E CONTROLE ---
 loginBtn.MouseButton1Click:Connect(function()
     if keyBox.Text == SENHA_CORRETA then
         loginFrame:Destroy()
@@ -658,22 +554,25 @@ local function setupDrag(frame)
 end
 setupDrag(mainFrame); setupDrag(loginFrame)
 
--- INPUT SYSTEM (CORRIGIDO E COMPLETADO)
+-- INPUT SYSTEM
 UserInputService.InputBegan:Connect(function(input, gpe)
-    if gpe then return end -- Ignora se estiver digitando no chat ou em uma TextBox
-    
+    if gpe then return end
     if input.KeyCode == Keybinds.Menu then
-        if mainFrame.Visible then
-            mainFrame.Visible = false
-        elseif not loginFrame.Parent then -- Só abre se já passou do login
-            mainFrame.Visible = true
-        end
+        mainFrame.Visible = not mainFrame.Visible
+    elseif input.KeyCode == Keybinds.Fly then
+        toggleFly(not States.Flying)
+    elseif input.KeyCode == Keybinds.Noclip then
+        States.Noclip = not States.Noclip
+        if updateNoclipUI then updateNoclipUI(States.Noclip) end
+    elseif input.KeyCode == Keybinds.Fling then
+        States.Fling = not States.Fling
+        if updateFlingUI then updateFlingUI(States.Fling) end
+    elseif input.KeyCode == Keybinds.ESP then
+        States.ESP = not States.ESP
+        if updateESPUI then updateESPUI(States.ESP) end
+    elseif input.KeyCode == Enum.KeyCode.R and spawnerPage.Visible then
+        updateSpawnerList()
     end
-    
-    if input.KeyCode == Keybinds.Fly then updateFlyUI(not States.Flying) end
-    if input.KeyCode == Keybinds.Noclip then updateNoclipUI(not States.Noclip) end
-    if input.KeyCode == Keybinds.Fling then updateFlingUI(not States.Fling) end
-    if input.KeyCode == Keybinds.ESP then updateESPUI(not States.ESP) end
-    if input.KeyCode == Keybinds.Progresso then updateProgUI(not States.AutoProg) end
 end)
 
+notify("RT HUB Carregado. Insira a senha.")
